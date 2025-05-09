@@ -23,3 +23,8 @@ dist-ssr
 *.sln
 *.sw?
 .env
+
+# Local screenshots (keep in README but don't track in git)
+sc.png
+sc1.png
+sc2.png
