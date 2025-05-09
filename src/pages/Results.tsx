@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AlertTriangle, ArrowLeft, Download, Share2 } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, Download, Share2, BarChart } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Button from '../components/ui/Button';
 import { AnalysisResult } from '../types/types';
 import SimilarCasesDisplay from '../components/SimilarCasesDisplay';
+import DownloadReport from '../components/results/DownloadReport';
+import AnalysisChart from '../components/results/AnalysisChart';
 
 const Results: React.FC = () => {
   const navigate = useNavigate();
@@ -23,10 +25,7 @@ const Results: React.FC = () => {
     setLoading(false);
   }, []);
 
-  const handleDownloadReport = () => {
-    // In a real application, we would generate a PDF report
-    toast.success('Report downloaded successfully');
-  };
+  // Download functionality is now handled by the DownloadReport component
 
   const handleShareResults = () => {
     // In a real application, we would implement sharing functionality
@@ -223,6 +222,17 @@ const Results: React.FC = () => {
             </p>
           </div>
 
+          {/* Visualization Section */}
+          <div className="mb-6 pb-6 border-b border-slate-200">
+            <div className="flex justify-between items-center mb-3">
+              <h2 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+                <BarChart size={20} className="text-blue-600" />
+                Data Visualization
+              </h2>
+            </div>
+            <AnalysisChart results={results} />
+          </div>
+
           {/* Similar Cases Display */}
           <SimilarCasesDisplay similarCases={results.similarCases} />
 
@@ -244,13 +254,7 @@ const Results: React.FC = () => {
               >
                 <Share2 size={18} /> Share
               </Button>
-              <Button
-                variant="primary"
-                onClick={handleDownloadReport}
-                className="flex items-center gap-2"
-              >
-                <Download size={18} /> Download Report
-              </Button>
+              <DownloadReport results={results} />
             </div>
           </div>
         </div>
