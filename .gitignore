@@ -24,7 +24,7 @@ dist-ssr
 *.sw?
 .env
 
-# Local screenshots (keep in README but don't track in git)
-sc.png
-sc1.png
-sc2.png
+# Local screenshots in root directory (but track ones in screenshots/ folder)
+/sc.png
+/sc1.png
+/sc2.png

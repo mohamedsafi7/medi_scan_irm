@@ -1,11 +1,11 @@
 # MediScan AI: Cancer Detection Analysis
 
 <div align="center">
-  <img src="https://i.imgur.com/8JlzXAF.png" alt="MediScan AI Logo" width="200"/>
+  <img src="screenshots/logo.png" alt="MediScan AI Logo" width="200"/>
   <br>
   <h3>Advanced Medical Image Analysis with AI</h3>
   <p>Leveraging Google's Gemini AI and Vector Database Technology for Enhanced Cancer Detection</p>
-  
+
   ![TypeScript](https://img.shields.io/badge/TypeScript-4.9.5-blue.svg)
   ![React](https://img.shields.io/badge/React-18.3.1-61dafb.svg)
   ![Gemini AI](https://img.shields.io/badge/Gemini_AI-2.0-orange.svg)
@@ -46,9 +46,9 @@ MediScan AI is an educational tool designed to demonstrate how artificial intell
 ## 🖼️ Screenshots
 
 <div align="center">
-  <img src="https://i.imgur.com/JKLzXYZ.png" alt="Analysis Screen" width="45%"/>
+  <img src="screenshots/analysis.png" alt="Analysis Screen" width="45%"/>
   &nbsp;&nbsp;
-  <img src="https://i.imgur.com/mNOP123.png" alt="Results Screen" width="45%"/>
+  <img src="screenshots/results.png" alt="Results Screen" width="45%"/>
 </div>
 
 ## 🚀 Getting Started
