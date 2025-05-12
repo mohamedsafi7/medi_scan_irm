@@ -1,0 +1,160 @@
+{
+  "hash": "7647e693",
+  "configHash": "1c9e4df8",
+  "lockfileHash": "2638c920",
+  "browserHash": "83081b11",
+  "optimized": {
+    "react": {
+      "src": "../../node_modules/react/index.js",
+      "file": "react.js",
+      "fileHash": "96df31ca",
+      "needsInterop": true
+    },
+    "react-dom/client": {
+      "src": "../../node_modules/react-dom/client.js",
+      "file": "react-dom_client.js",
+      "fileHash": "05e7801d",
+      "needsInterop": true
+    },
+    "react-router-dom": {
+      "src": "../../node_modules/react-router-dom/dist/index.js",
+      "file": "react-router-dom.js",
+      "fileHash": "9f9dbb52",
+      "needsInterop": false
+    },
+    "react-hot-toast": {
+      "src": "../../node_modules/react-hot-toast/dist/index.mjs",
+      "file": "react-hot-toast.js",
+      "fileHash": "a9cb3af6",
+      "needsInterop": false
+    },
+    "lucide-react": {
+      "src": "../../node_modules/lucide-react/dist/esm/lucide-react.js",
+      "file": "lucide-react.js",
+      "fileHash": "22798781",
+      "needsInterop": false
+    },
+    "react-dropzone": {
+      "src": "../../node_modules/react-dropzone/dist/es/index.js",
+      "file": "react-dropzone.js",
+      "fileHash": "979778eb",
+      "needsInterop": false
+    },
+    "recharts": {
+      "src": "../../node_modules/recharts/es6/index.js",
+      "file": "recharts.js",
+      "fileHash": "768b2cfa",
+      "needsInterop": false
+    },
+    "html2canvas": {
+      "src": "../../node_modules/html2canvas/dist/html2canvas.esm.js",
+      "file": "html2canvas.js",
+      "fileHash": "9819dca1",
+      "needsInterop": false
+    },
+    "jspdf": {
+      "src": "../../node_modules/jspdf/dist/jspdf.es.min.js",
+      "file": "jspdf.js",
+      "fileHash": "e3ad0440",
+      "needsInterop": false
+    },
+    "react-hook-form": {
+      "src": "../../node_modules/react-hook-form/dist/index.esm.mjs",
+      "file": "react-hook-form.js",
+      "fileHash": "41780119",
+      "needsInterop": false
+    },
+    "@google/generative-ai": {
+      "src": "../../node_modules/@google/generative-ai/dist/index.mjs",
+      "file": "@google_generative-ai.js",
+      "fileHash": "a591aa35",
+      "needsInterop": false
+    },
+    "chromadb": {
+      "src": "../../node_modules/chromadb/dist/chromadb.mjs",
+      "file": "chromadb.js",
+      "fileHash": "b932409a",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "voyageai-XB25WRRQ": {
+      "file": "voyageai-XB25WRRQ.js"
+    },
+    "sts-CUXIUFY3": {
+      "file": "sts-CUXIUFY3.js"
+    },
+    "loadSts-K6IW2R5G": {
+      "file": "loadSts-K6IW2R5G.js"
+    },
+    "chunk-CS7IYQNM": {
+      "file": "chunk-CS7IYQNM.js"
+    },
+    "cohere-ai-ECVPXXSP": {
+      "file": "cohere-ai-ECVPXXSP.js"
+    },
+    "chunk-KXXQHYEK": {
+      "file": "chunk-KXXQHYEK.js"
+    },
+    "dist-LTAOQP65": {
+      "file": "dist-LTAOQP65.js"
+    },
+    "dist-FUL3ZJ7W": {
+      "file": "dist-FUL3ZJ7W.js"
+    },
+    "version-CNW66L3D": {
+      "file": "version-CNW66L3D.js"
+    },
+    "openai-HXDRH7CW": {
+      "file": "openai-HXDRH7CW.js"
+    },
+    "chunk-LFU3LLHJ": {
+      "file": "chunk-LFU3LLHJ.js"
+    },
+    "transformers-TKW6WJCE": {
+      "file": "transformers-TKW6WJCE.js"
+    },
+    "chunk-W4FGX6AR": {
+      "file": "chunk-W4FGX6AR.js"
+    },
+    "purify.es-RRUL6NGC": {
+      "file": "purify__es-RRUL6NGC.js"
+    },
+    "index.es-LLUUZJ6C": {
+      "file": "index__es-LLUUZJ6C.js"
+    },
+    "chunk-SITVF2AJ": {
+      "file": "chunk-SITVF2AJ.js"
+    },
+    "transformers-6HVIHXBA": {
+      "file": "transformers-6HVIHXBA.js"
+    },
+    "chunk-PJLSDOI6": {
+      "file": "chunk-PJLSDOI6.js"
+    },
+    "loadCognitoIdentity-QJK74YZC": {
+      "file": "loadCognitoIdentity-QJK74YZC.js"
+    },
+    "chunk-TJEVHZ2X": {
+      "file": "chunk-TJEVHZ2X.js"
+    },
+    "chunk-YDYV3GMK": {
+      "file": "chunk-YDYV3GMK.js"
+    },
+    "chunk-NOR3QQAA": {
+      "file": "chunk-NOR3QQAA.js"
+    },
+    "chunk-UHINIFCJ": {
+      "file": "chunk-UHINIFCJ.js"
+    },
+    "chunk-JL2MEAST": {
+      "file": "chunk-JL2MEAST.js"
+    },
+    "chunk-W4EHDCLL": {
+      "file": "chunk-W4EHDCLL.js"
+    },
+    "chunk-EWTE5DHJ": {
+      "file": "chunk-EWTE5DHJ.js"
+    }
+  }
+}

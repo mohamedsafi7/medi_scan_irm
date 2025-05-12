@@ -106,18 +106,70 @@ const Results: React.FC = () => {
           <div className="mb-6 pb-6 border-b border-slate-200">
             <div className="flex justify-between items-center mb-3">
               <h2 className="text-lg font-semibold text-slate-800">Analysis Result</h2>
-              <div className={`px-3 py-1 rounded-full text-sm font-medium ${
-                results.prediction === 'Positive'
-                  ? 'bg-red-100 text-red-700'
-                  : 'bg-green-100 text-green-700'
-              }`}>
-                {results.prediction}
+              <div className="flex gap-2">
+                {results.ml_available && (
+                  <div className="px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-700">
+                    ML Model
+                  </div>
+                )}
+                <div className={`px-3 py-1 rounded-full text-sm font-medium ${
+                  results.prediction === 'Positive'
+                    ? 'bg-red-100 text-red-700'
+                    : 'bg-green-100 text-green-700'
+                }`}>
+                  {results.prediction}
+                </div>
               </div>
             </div>
 
+            {/* ML Model Prediction (if available) */}
+            {results.ml_available && (
+              <div className="mb-4 bg-slate-50 p-3 rounded-lg border border-slate-200">
+                <h3 className="text-md font-medium text-slate-700 mb-2 flex items-center">
+                  <span className="inline-block w-3 h-3 rounded-full bg-purple-500 mr-2"></span>
+                  ML Model Prediction
+                  <span className="ml-2 text-sm font-normal text-slate-500">
+                    ({results.ml_confidence ? Math.round(results.ml_confidence * 100) : 'N/A'}% confidence)
+                  </span>
+                </h3>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <div className={`px-3 py-1 rounded-full text-sm font-medium mr-3 ${
+                      results.ml_prediction === 'Positive'
+                        ? 'bg-red-100 text-red-700'
+                        : results.ml_prediction === 'Negative'
+                          ? 'bg-green-100 text-green-700'
+                          : 'bg-gray-100 text-gray-700'
+                    }`}>
+                      {results.ml_prediction || 'Unknown'}
+                    </div>
+                    <span className="text-sm text-slate-600">
+                      {results.ml_prediction === results.prediction
+                        ? 'Matches Gemini AI prediction'
+                        : 'Different from Gemini AI prediction'}
+                    </span>
+                  </div>
+                  {results.ml_confidence && (
+                    <div className="w-24 bg-slate-200 rounded-full h-3">
+                      <div
+                        className={`h-3 rounded-full ${
+                          results.ml_prediction === 'Positive'
+                            ? 'bg-red-500'
+                            : 'bg-green-500'
+                        }`}
+                        style={{ width: `${results.ml_confidence * 100}%` }}
+                      ></div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Gemini AI Prediction */}
             <div className="mb-4">
-              <h3 className="text-md font-medium text-slate-700 mb-2">
-                Confidence Score
+              <h3 className="text-md font-medium text-slate-700 mb-2 flex items-center">
+                <span className="inline-block w-3 h-3 rounded-full bg-blue-500 mr-2"></span>
+                Gemini AI Prediction
                 <span className="ml-2 text-sm font-normal text-slate-500">
                   ({Math.round(results.confidenceScore * 100)}% confidence in {results.prediction.toLowerCase()} result)
                 </span>

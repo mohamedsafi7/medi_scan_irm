@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../node_modules/openai/src/version.ts"],
+  "sourcesContent": ["export const VERSION = '4.98.0'; // x-release-please-version\n"],
+  "mappings": ";AAAO,IAAM,UAAU;",
+  "names": []
+}

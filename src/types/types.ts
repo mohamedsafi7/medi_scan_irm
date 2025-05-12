@@ -28,4 +28,11 @@ export interface AnalysisResult {
   recommendations: string[];
   imageAnnotations?: ImageAnnotation[];
   similarCases?: SimilarCase[];
+  // ML model specific fields
+  ml_prediction?: 'Positive' | 'Negative' | null;
+  ml_confidence?: number | null;
+  ml_available?: boolean;
+  ml_error?: string;
+  // Image validation
+  is_valid_mri?: boolean;
 }

@@ -15,16 +15,17 @@
 
 ## 🔍 Overview
 
-MediScan AI is an educational tool designed to demonstrate how artificial intelligence can assist in the analysis of medical images for potential cancer indicators. The application combines Google's powerful Gemini AI technology with a vector database (Chroma) to provide contextually relevant analysis based on historical cancer data.
+MediScan AI is an educational tool designed to demonstrate how artificial intelligence can assist in the analysis of medical images for potential cancer indicators. The application combines Google's powerful Gemini AI technology with reference MRI images from the "Breast Cancer Patients MRI's" dataset to provide contextually relevant analysis.
 
 > **⚠️ Important Disclaimer**: MediScan AI is designed for educational purposes only and should not replace professional medical diagnosis. All results should be reviewed by qualified healthcare professionals.
 
 ## ✨ Key Features
 
 ### 🧠 AI-Powered Analysis
-- Utilizes Google's Gemini AI to analyze medical images for potential cancer indicators
-- Provides confidence scores, detailed analysis, and recommendations
-- Enhanced with vector database technology for more accurate results
+- Dual AI approach: Machine Learning model + Gemini AI for comprehensive analysis
+- ML model trained directly on the MRI dataset for accurate classification
+- Gemini AI provides detailed analysis and explanations
+- Enhanced with reference MRI images from healthy and sick patients for more accurate results
 
 ### 📊 Advanced Visualizations
 - **Key Metrics Comparison**: Compares detected metrics with benign and malignant thresholds
@@ -38,10 +39,10 @@ MediScan AI is an educational tool designed to demonstrate how artificial intell
 - Includes patient information, analysis results, and recommendations
 - Professional layout suitable for educational purposes
 
-### 🔄 Vector Database Integration
-- Stores and retrieves similar cancer cases from historical data
+### 🔄 MRI Reference Integration
+- Uses reference MRI images from the "Breast Cancer Patients MRI's" dataset
 - Enhances AI analysis with contextually relevant examples
-- Provides reference points for comparison
+- Provides reference points for comparison between healthy and sick patients
 
 ## 🖼️ Screenshots
 
@@ -56,6 +57,8 @@ MediScan AI is an educational tool designed to demonstrate how artificial intell
 ### Prerequisites
 - Node.js (v18.18.0 or higher)
 - npm (v9.0.0 or higher)
+- Python (v3.8 or higher)
+- pip (for Python package management)
 
 ### Installation
 
@@ -65,25 +68,45 @@ git clone https://github.com/mohamedsafi7/medi_scan.git
 cd medi_scan
 ```
 
-2. Install dependencies:
+2. Install JavaScript dependencies:
 ```bash
 npm install
 ```
 
-3. Create a `.env` file in the root directory with your Gemini API key:
+3. Install Python dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+4. Create a `.env` file in the root directory with your Gemini API key:
 ```
 VITE_GEMINI_API_KEY=your_gemini_api_key_here
 ```
 
-4. Start the development server:
+5. (Optional) Train the ML model on the MRI dataset:
+```bash
+python train_mri_model.py
+```
+
+6. Start the application (both frontend and Python backend):
+```bash
+start-app.bat
+```
+
+Alternatively, you can start the components separately:
+
+- Start the Python backend:
+```bash
+set GEMINI_API_KEY=your_gemini_api_key_here
+python mri_analysis_service.py
+```
+
+- Start the React frontend:
 ```bash
 npm run dev
 ```
 
-5. (Optional) Start the Chroma server for vector database functionality:
-```bash
-npm run start-chroma
-```
+Note: If you skip the model training step, the application will still work using only the Gemini AI analysis.
 
 ## 📋 Usage Guide
 
@@ -98,19 +121,21 @@ npm run start-chroma
 
 ### Recommended Image Types
 
+- **MRI scans** (preferred for this analysis)
 - Mammograms
-- MRI scans
 - CT scans
 - Histopathology images
 - X-rays
 
+The application is specifically optimized for breast MRI images from the "Breast Cancer Patients MRI's" dataset.
+
 ## 📊 Visualization Components
 
 ### Key Metrics Comparison
-Compares the current case's key metrics with established thresholds for benign and malignant tumors from the Cancer_Data.csv dataset.
+Compares the current case's key metrics with established thresholds for benign and malignant tumors based on reference MRI images.
 
 ### Case Comparison Chart
-Directly compares the current case with similar cases from the dataset, focusing on the two most important metrics for cancer detection.
+Directly compares the current case with similar cases from the MRI dataset, focusing on the key metrics for cancer detection.
 
 ### Risk Assessment Gauge
 Provides an intuitive visualization of the overall risk level based on the AI analysis.
@@ -130,23 +155,24 @@ Displays a hypothetical projection of how the confidence score might change over
 - React Router for navigation
 
 ### AI Integration
-- Google's Gemini AI API for image analysis
+- Google's Gemini AI API for MRI image analysis
+- Python backend for processing and analysis
 - Prompt engineering for structured analysis results
 
-### Vector Database
-- Chroma DB for storing and querying cancer data
-- Vector embeddings for similarity search
+### MRI Dataset Integration
+- Reference MRI images from "Breast Cancer Patients MRI's" dataset
+- Comparison between healthy and sick patient MRIs
 
 ### Data Processing
-- CSV parsing for cancer reference data
-- Image processing for AI analysis
+- MRI image processing and analysis
+- Key metrics extraction for visualization
 
 ## 🔧 Development
 
 ### Project Structure
 ```
 medi_scan/
-├── src/
+├── src/                 # React frontend
 │   ├── components/      # UI components
 │   │   ├── analysis/    # Analysis-related components
 │   │   ├── results/     # Visualization components
@@ -154,13 +180,23 @@ medi_scan/
 │   ├── pages/           # Application pages
 │   ├── services/        # API and data services
 │   └── types/           # TypeScript type definitions
-├── data/                # Reference data
+├── data/                # Reference MRI data
+│   └── Breast Cancer Patients MRI's/
+│       ├── train/       # Training MRI images
+│       │   ├── Healthy/ # Healthy patient MRIs
+│       │   └── Sick/    # Cancer patient MRIs
+│       └── validation/  # Validation MRI images
+│           ├── Healthy/ # Healthy patient MRIs
+│           └── Sick/    # Cancer patient MRIs
+├── mri_analysis_service.py  # Python backend for MRI analysis
+├── requirements.txt     # Python dependencies
+├── start-app.bat        # Script to start both frontend and backend
 └── public/              # Static assets
 ```
 
 ### Key Files
-- `src/services/geminiService.ts`: Handles interaction with Gemini AI
-- `src/services/chromaService.ts`: Manages vector database operations
+- `mri_analysis_service.py`: Python backend for MRI image analysis with Gemini AI
+- `src/services/geminiService.ts`: Frontend service to communicate with Python backend
 - `src/components/results/*.tsx`: Visualization components
 - `src/pages/Results.tsx`: Main results display page
 
@@ -171,8 +207,8 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## 🙏 Acknowledgements
 
 - Google Gemini AI for providing the image analysis capabilities
-- Chroma Vector Database for similarity search functionality
-- React and TypeScript communities for excellent development tools
+- The creators of the "Breast Cancer Patients MRI's" dataset
+- React, TypeScript, and Python communities for excellent development tools
 - Medical professionals who provided guidance on cancer detection metrics
 
 ## 🤝 Contributing
