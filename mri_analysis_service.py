@@ -55,6 +55,7 @@ except Exception as e:
 def validate_mri_image(image: Image.Image) -> Dict:
     """
     Validate if the image is likely a breast MRI.
+    Made more lenient to accept various medical image formats.
 
     Args:
         image: PIL Image object
@@ -67,58 +68,38 @@ def validate_mri_image(image: Image.Image) -> Dict:
         width, height = image.size
         aspect_ratio = width / height
 
-        # MRIs typically have aspect ratios close to 1 (square) or 4:3
-        if aspect_ratio < 0.5 or aspect_ratio > 2.0:
+        # More lenient aspect ratio check - accept most reasonable image ratios
+        if aspect_ratio < 0.2 or aspect_ratio > 5.0:
             return {
                 "is_valid": False,
-                "reason": "Image aspect ratio is not typical for MRI images"
+                "reason": "Image aspect ratio is extremely unusual for medical images"
             }
 
-        # 2. Check color distribution
-        # Medical images typically have specific color distributions
+        # 2. Basic size check - ensure image is not too small
+        if width < 50 or height < 50:
+            return {
+                "is_valid": False,
+                "reason": "Image is too small for meaningful analysis"
+            }
+
+        # 3. Check if image is completely black or white
         img_array = np.array(image)
 
         # Convert to grayscale for analysis if it's RGB
-        if len(img_array.shape) == 3 and img_array.shape[2] == 3:
-            # For RGB images, check if it's actually grayscale (all channels similar)
-            r, g, b = img_array[:,:,0], img_array[:,:,1], img_array[:,:,2]
-
-            # If the image has vibrant colors (high standard deviation between channels)
-            # it's likely not a medical image
-            if np.std([np.mean(r), np.mean(g), np.mean(b)]) > 20:
-                return {
-                    "is_valid": False,
-                    "reason": "Image contains vibrant colors not typical of MRI images"
-                }
-
-        # 3. Check for typical MRI characteristics
-        # MRIs typically have specific brightness distributions
-        # Convert to grayscale for histogram analysis
         if len(img_array.shape) == 3:
             gray_img = np.mean(img_array, axis=2).astype(np.uint8)
         else:
             gray_img = img_array
 
-        # Calculate histogram
-        hist = np.histogram(gray_img, bins=50)[0]
-        hist = hist / np.sum(hist)  # Normalize
-
-        # MRIs typically have a specific histogram shape with multiple peaks
-        # and significant dark areas (background)
-        dark_ratio = np.sum(hist[:10]) / np.sum(hist)
-
-        # If there's very little dark area, it's likely not an MRI
-        if dark_ratio < 0.05:
+        # Check if image has any variation (not completely uniform)
+        if np.std(gray_img) < 5:
             return {
                 "is_valid": False,
-                "reason": "Image lacks typical MRI contrast characteristics"
+                "reason": "Image appears to be uniform (no variation in pixel values)"
             }
 
-        # 4. Check for text/annotations typical in medical images
-        # This is a simplified check - in a production system, you might use OCR
-        # to detect medical terminology or MRI-specific annotations
-
-        # For now, we'll consider the image valid if it passed the above checks
+        # For now, we'll consider most images valid if they pass basic checks
+        # This allows for more flexibility in testing different image types
         return {
             "is_valid": True
         }
