@@ -40,6 +40,11 @@ export const loadCancerData = async (): Promise<boolean> => {
   try {
     const collection = await initializeCollection();
 
+    if (!collection) {
+      console.log("ChromaDB not available, skipping data loading");
+      return true; // Return true to indicate the app can continue without Chroma
+    }
+
     // Try different possible paths for the CSV file
     let response;
     try {
@@ -111,22 +116,26 @@ export const loadCancerData = async (): Promise<boolean> => {
     console.log(`Loaded ${documents.length} cancer data records into Chroma`);
     return true;
   } catch (error) {
-    console.error("Error loading cancer data into Chroma:", error);
-    throw error;
+    console.warn("Error loading cancer data into Chroma, continuing without it:", error);
+    return true; // Return true to allow the app to continue
   }
 };
 
 /**
  * Check if cancer data is already loaded in Chroma
- * @returns True if data is loaded
+ * @returns True if data is loaded or if ChromaDB is not available
  */
 export const isDataLoaded = async (): Promise<boolean> => {
   try {
     const collection = await initializeCollection();
+    if (!collection) {
+      // If ChromaDB is not available, consider data as "loaded" to continue
+      return true;
+    }
     const count = await collection.count();
     return count > 0;
   } catch (error) {
-    console.error("Error checking if data is loaded:", error);
-    return false;
+    console.warn("Error checking if data is loaded, assuming loaded:", error);
+    return true; // Return true to allow the app to continue
   }
 };

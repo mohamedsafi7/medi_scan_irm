@@ -1,19 +1,30 @@
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { PatientInfo, AnalysisResult, SimilarCase } from '../types/types';
+import { querySimilarCases } from './chromaService';
+import { loadCancerData, isDataLoaded } from './dataLoaderService';
 
-// Python backend URL
-const PYTHON_BACKEND_URL = 'http://localhost:5000/api/analyze';
+// Initialize Gemini AI
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+const genAI = new GoogleGenerativeAI(API_KEY);
 
 /**
- * Initialize the MRI data - this is a placeholder function to maintain compatibility
- * with the existing code that calls this function
+ * Initialize cancer data for analysis
  */
 export const initializeCancerData = async (): Promise<void> => {
-  console.log('MRI data initialization is handled by the Python backend.');
-  return Promise.resolve();
+  try {
+    const dataLoaded = await isDataLoaded();
+    if (!dataLoaded) {
+      console.log('Loading cancer data...');
+      await loadCancerData();
+    }
+    console.log('Cancer data initialized successfully');
+  } catch (error) {
+    console.warn('Failed to initialize cancer data, continuing without it:', error);
+  }
 };
 
 /**
- * Analyze a medical image using the Python backend with Gemini AI and MRI reference images
+ * Analyze a medical image using Gemini AI directly
  * @param image Medical image file
  * @param patientInfo Patient information
  * @returns Analysis result
@@ -23,91 +34,156 @@ export const analyzeImage = async (
   patientInfo: PatientInfo
 ): Promise<AnalysisResult> => {
   try {
+    if (!API_KEY) {
+      throw new Error('Gemini API key is not configured. Please set VITE_GEMINI_API_KEY in your environment variables.');
+    }
+
+    console.log('Analyzing image with Gemini AI...');
+
     // Convert image to base64
-    const imageData = await new Promise<string>((resolve) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result as string);
-      reader.readAsDataURL(image);
-    });
+    const imageData = await fileToGenerativePart(image);
 
-    console.log('Sending image to Python backend for MRI analysis...');
+    // Get similar cases from ChromaDB
+    const similarCases = await querySimilarCases(patientInfo);
 
-    // First check if the server is running
-    try {
-      const testResponse = await fetch('http://localhost:5000/api/test');
-      if (!testResponse.ok) {
-        console.error('MRI analysis server test failed:', await testResponse.text());
-        throw new Error('MRI analysis server is not responding properly. Please check if it\'s running.');
-      } else {
-        console.log('MRI analysis server test successful:', await testResponse.json());
-      }
-    } catch (testError) {
-      console.error('Error connecting to MRI analysis server:', testError);
-      throw new Error('Failed to connect to MRI analysis server. Please make sure it\'s running on http://localhost:5000');
-    }
+    // Create detailed prompt for medical analysis
+    const prompt = createMedicalAnalysisPrompt(patientInfo, similarCases);
 
-    // Send the image and patient info to the Python backend
-    console.log('Sending request to MRI analysis server...');
-    const response = await fetch(PYTHON_BACKEND_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        image: imageData,
-        patientInfo
-      })
-    });
+    // Analyze with Gemini
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const result = await model.generateContent([prompt, imageData]);
+    const response = await result.response;
+    const analysisText = response.text();
 
-    if (!response.ok) {
-      const errorData = await response.text();
-      console.error('Backend error response:', errorData);
-      try {
-        // Try to parse as JSON
-        const errorJson = JSON.parse(errorData);
-        throw new Error(`Backend error: ${errorJson.error || errorData}`);
-      } catch (e) {
-        // If not JSON, use the raw text
-        throw new Error(`Backend error (${response.status}): ${errorData}`);
-      }
-    }
+    console.log('Received analysis from Gemini AI');
 
-    // Parse the response
-    const result = await response.json();
+    // Parse the analysis result
+    const parsedResult = parseGeminiResponse(analysisText, patientInfo, similarCases);
 
-    console.log('Received analysis from Python backend:', result);
-
-    // Check if the image is invalid
-    if (result.error === "Invalid image type") {
-      throw new Error(`${result.details || "The uploaded image does not appear to be a valid breast MRI."}
-
-Please upload a proper breast MRI image for accurate analysis.`);
-    }
-
-    // Extract the key metrics for visualization if available
-    const imageAnnotations = result.keyMetrics ?
-      Object.entries(result.keyMetrics).map(([key, value]) => ({
-        x: Math.random() * 80 + 10, // Random position for demonstration
-        y: Math.random() * 80 + 10,
-        width: 20,
-        height: 20,
-        label: `${key}: ${value}`
-      })) :
-      undefined;
-
-    // Return the analysis result in the expected format
-    return {
-      patientInfo,
-      prediction: result.prediction as 'Positive' | 'Negative',
-      confidenceScore: result.confidenceScore,
-      detailedAnalysis: result.detailedAnalysis,
-      recommendations: result.recommendations,
-      similarCases: result.similarCases,
-      imageAnnotations,
-      is_valid_mri: result.is_valid_mri
-    };
+    return parsedResult;
   } catch (error) {
     console.error('Error analyzing image:', error);
-    throw new Error('Failed to analyze image. Please try again.');
+    throw new Error(`Failed to analyze image: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 };
+
+/**
+ * Convert file to format suitable for Gemini AI
+ */
+async function fileToGenerativePart(file: File) {
+  const base64EncodedDataPromise = new Promise<string>((resolve) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64String = (reader.result as string).split(',')[1];
+      resolve(base64String);
+    };
+    reader.readAsDataURL(file);
+  });
+
+  return {
+    inlineData: {
+      data: await base64EncodedDataPromise,
+      mimeType: file.type,
+    },
+  };
+}
+
+/**
+ * Create detailed medical analysis prompt
+ */
+function createMedicalAnalysisPrompt(patientInfo: PatientInfo, similarCases: SimilarCase[]): string {
+  const similarCasesText = similarCases.length > 0
+    ? `\n\nSimilar cases for reference:\n${similarCases.map(c => `- ${c.diagnosis}: ${c.data}`).join('\n')}`
+    : '';
+
+  return `You are an expert radiologist specializing in breast MRI analysis. Analyze this medical image and provide a comprehensive assessment.
+
+Patient Information:
+- Name: ${patientInfo.name}
+- Age: ${patientInfo.age}
+- Gender: ${patientInfo.gender}
+- Medical History: ${patientInfo.medicalHistory || 'None provided'}
+
+${similarCasesText}
+
+Please provide your analysis in the following JSON format:
+{
+  "prediction": "Positive" or "Negative",
+  "confidenceScore": 0.0-1.0,
+  "detailedAnalysis": "Detailed medical analysis of the image",
+  "keyMetrics": {
+    "Tissue Density": 0-100,
+    "Border Irregularity": 0-100,
+    "Contrast Enhancement": 0-100,
+    "Size (relative)": 0-100,
+    "Symmetry Disruption": 0-100
+  },
+  "recommendations": ["recommendation1", "recommendation2", "recommendation3"],
+  "is_valid_mri": true/false
+}
+
+Focus on:
+1. Image quality and whether it appears to be a valid breast MRI
+2. Tissue characteristics and any suspicious areas
+3. Comparison with normal breast tissue patterns
+4. Risk assessment based on visible features
+5. Appropriate follow-up recommendations
+
+Remember: This is for educational purposes only and should not replace professional medical diagnosis.`;
+}
+
+/**
+ * Parse Gemini AI response into structured format
+ */
+function parseGeminiResponse(analysisText: string, patientInfo: PatientInfo, similarCases: SimilarCase[]): AnalysisResult {
+  try {
+    // Try to extract JSON from the response
+    const jsonMatch = analysisText.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      const parsed = JSON.parse(jsonMatch[0]);
+
+      // Generate image annotations based on key metrics
+      const imageAnnotations = parsed.keyMetrics ?
+        Object.entries(parsed.keyMetrics).map(([key, value], index) => ({
+          x: 20 + (index % 3) * 30,
+          y: 20 + Math.floor(index / 3) * 25,
+          width: 25,
+          height: 20,
+          label: `${key}: ${value}`
+        })) : undefined;
+
+      return {
+        patientInfo,
+        prediction: parsed.prediction === 'Positive' ? 'Positive' : 'Negative',
+        confidenceScore: parsed.confidenceScore || 0.5,
+        detailedAnalysis: parsed.detailedAnalysis || analysisText,
+        recommendations: parsed.recommendations || ['Consult with a medical professional for proper diagnosis'],
+        similarCases: similarCases.slice(0, 3),
+        imageAnnotations,
+        is_valid_mri: parsed.is_valid_mri !== false
+      };
+    }
+  } catch (error) {
+    console.warn('Failed to parse JSON response, using fallback:', error);
+  }
+
+  // Fallback parsing if JSON extraction fails
+  const prediction = analysisText.toLowerCase().includes('positive') ||
+                    analysisText.toLowerCase().includes('malignant') ||
+                    analysisText.toLowerCase().includes('suspicious') ? 'Positive' : 'Negative';
+
+  return {
+    patientInfo,
+    prediction,
+    confidenceScore: 0.75,
+    detailedAnalysis: analysisText,
+    recommendations: [
+      'Consult with a medical professional for proper diagnosis',
+      'Consider additional imaging if recommended',
+      'Follow up as advised by your healthcare provider'
+    ],
+    similarCases: similarCases.slice(0, 3),
+    imageAnnotations: undefined,
+    is_valid_mri: true
+  };
+}

@@ -7,14 +7,12 @@ import Home from './pages/Home';
 import Analysis from './pages/Analysis';
 import Results from './pages/Results';
 import About from './pages/About';
-import ChromaInitializer from './components/ChromaInitializer';
 
 function App() {
   return (
     <Router>
       <div className="min-h-screen flex flex-col bg-slate-50">
         <Toaster position="top-right" />
-        <ChromaInitializer />
         <Header />
         <main className="flex-grow">
           <Routes>

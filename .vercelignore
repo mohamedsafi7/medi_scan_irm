@@ -1,0 +1,55 @@
+# Python files and directories
+*.py
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.git
+.mypy_cache
+.pytest_cache
+.hypothesis
+
+# Python specific files
+requirements.txt
+mri_cancer_model.h5
+*.pkl
+*.joblib
+
+# Data directories
+data/
+models/
+evaluation_results/
+
+# Documentation that's not needed for frontend
+*.md
+!README.md
+
+# Development files
+.env.local
+.env.development
+.env.test
+.env.production
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
